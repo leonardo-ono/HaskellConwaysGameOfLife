@@ -61,15 +61,15 @@ initialGrid = zip [(x, y) | y <- [0..(rows - 1)], x <- [0..(cols - 1)]] (map toI
 
 simulateGameOfLife grid = map evolve grid
     where evolve ((x, y), cellState) = ((x, y), newCellState)
-              where newCellState = fromMaybe 0 $ lookup (cellState, evalNeighbors) alive
-                    alive = [((0, 3), 1), ((1, 2), 1), ((1, 3), 1)] 
+              where newCellState = if (cellState, evalNeighbors) `elem` alive then 1 else 0
+                    alive = [(0, 3), (1, 2), (1, 3)] 
                     evalNeighbors = sum $ map neighborState neighbors
                     neighborState (x', y') = fromMaybe 0 $ lookup (x' + x, y' + y) grid
                     neighbors = [(x, y) | x <- [-1, 0, 1], y <- [-1, 0, 1], x /= 0 || y /= 0]
 
---- View ---
-
 update _ _ grid = simulateGameOfLife grid
+
+--- View ---
 
 render grid = scale 1 (-1) $ pictures $ map (toPicture . rescale) grid
     where rescale ((x, y), s) = ((fromIntegral ((x - (cols `div` 2)) * 10)
