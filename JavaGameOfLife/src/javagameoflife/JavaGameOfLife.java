@@ -49,24 +49,29 @@ public class JavaGameOfLife {
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
     };
     
+    static int evaluateNeighbors(int col, int row, int grid[][]) {
+        int sum = 0;
+        for (int y = -1; y <= 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                if (x != 0 || y != 0) {
+                    try {
+                        sum += grid[y + row][x + col];
+                    }
+                    catch (ArrayIndexOutOfBoundsException e) {
+                        // just ignore
+                    }
+                }
+            }
+        }
+        return sum;
+    }
+
     static final int[][] GRID_TMP = new int[GRID_ROWS][GRID_COLS];
     
     static void simulate(int grid[][]) {
         for (int row = 0; row < GRID_ROWS; row++) {
             for (int col = 0; col < GRID_COLS; col++) {
-                int sum = 0;
-                for (int y = -1; y <= 1; y++) {
-                    for (int x = -1; x <= 1; x++) {
-                        if (x != 0 || y != 0) {
-                            try {
-                                sum += grid[y + row][x + col];
-                            }
-                            catch (ArrayIndexOutOfBoundsException e) {
-                                // just ignore
-                            }
-                        }
-                    }
-                }
+                int sum = evaluateNeighbors(col, row, grid);
                 if (grid[row][col] == 0 && sum == 3) {
                     GRID_TMP[row][col] = 1;
                 }
