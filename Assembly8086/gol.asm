@@ -78,7 +78,7 @@ section .text
 			mov cl, 0 ; result
 		
 			; to keep things simple, 
-			; borders was just ignored
+			; let's just ignore the borders
 			mov ax, si
 			mov dl, GRID_COLS
 			div dl ; al=y / ah=x
@@ -94,28 +94,20 @@ section .text
 			mov al, [grid + si] ; current state
 			
 			; evaluate neighbors
-			xor bl, bl
-			add bl, [grid + si - (GRID_COLS + 1)]
-			add bl, [grid + si - GRID_COLS]
-			add bl, [grid + si - (GRID_COLS - 1)]
-			add bl, [grid + si - 1]
-			add bl, [grid + si + 1]
-			add bl, [grid + si + (GRID_COLS + 1)]
-			add bl, [grid + si + GRID_COLS]
-			add bl, [grid + si + (GRID_COLS - 1)]
+			xor ah, ah
+			mov di, 0
+		.next_neighbor:
+			mov bp, [neighbors_offset + di]
+			add ah, [grid + si + bp]
+			add di, 2
+			cmp di, 16
+			jb .next_neighbor
 			
-			cmp al, 0 
-			jz .current_state_0
-			
-		.current_state_1:
-			cmp bl, 2
+			cmp ax, 201h
 			jz .alive
-			cmp bl, 3
+			cmp ax, 301h
 			jz .alive
-			jmp .ignore
-			
-		.current_state_0:
-			cmp bl, 3
+			cmp ax, 300h
 			jz .alive
 			jmp .ignore
 			
@@ -138,7 +130,10 @@ section .text
 			ret
 	
 section .data
-	
+
+	neighbors_offset dw -(GRID_COLS + 1), -GRID_COLS, -(GRID_COLS - 1), -1
+					 dw 1, (GRID_COLS + 1), GRID_COLS, (GRID_COLS - 1)
+					
 	GRID_COLS equ 80	
 	GRID_ROWS equ 25
 	
@@ -171,4 +166,3 @@ section .data
 	
 section .bss
 	grid_tmp resb GRID_COLS * GRID_ROWS
-		
