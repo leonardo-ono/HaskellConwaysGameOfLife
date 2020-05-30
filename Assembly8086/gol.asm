@@ -15,6 +15,8 @@
 section .text
 
 	start:
+			cld ; clear direction flag
+			
 		.main_loop:
 			call print_grid
 			
@@ -41,7 +43,6 @@ section .text
 			int 1ah
 			mov bx, dx
 		.wait:
-			mov ah, 0
 			int 1ah
 			sub dx, bx
 			cmp dx, si
@@ -59,9 +60,9 @@ section .text
 			
 			; convert 1 to filled box char
 			cmp al, 0
-			jz .continue
+			jz .char_ok
 			mov al, 219
-		.continue:
+		.char_ok:
 		
 			mov [es:di], al
 			add di, 2
@@ -132,8 +133,8 @@ section .text
 section .data
 
 	neighbors_offset dw -(GRID_COLS + 1), -GRID_COLS, -(GRID_COLS - 1), -1
-					 dw 1, (GRID_COLS + 1), GRID_COLS, (GRID_COLS - 1)
-					
+                     dw 1, (GRID_COLS + 1), GRID_COLS, (GRID_COLS - 1)
+					 
 	GRID_COLS equ 80	
 	GRID_ROWS equ 25
 	
@@ -166,3 +167,4 @@ section .data
 	
 section .bss
 	grid_tmp resb GRID_COLS * GRID_ROWS
+		
